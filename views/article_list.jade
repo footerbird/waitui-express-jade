@@ -1,0 +1,132 @@
+extends layout
+
+block prepend pub_head
+    link(rel='stylesheet', href='/css/swiper.min.css')
+
+block content
+    .container.after-cls.pt30.pb30
+        .article-left
+            .hotwords
+                font 热搜词：
+                for hotword in article_hotword
+                    a(href='/article_search/'+hotword.hotword_name) #{hotword.hotword_name}
+            .article-table
+                table
+                    tr
+                        td(rowspan='2')
+                            a(href='/article_detail/'+article_first.article_id+'.html',target='_blank',title=article_first.article_title)
+                                img.big(src=article_first.thumb_path,alt=article_first.article_title)
+                                .title.ta-c #{article_first.article_title}
+                        td.pr0(width='240')
+                            a(href='/article_detail/'+article_second.article_id+'.html',target='_blank',title=article_second.article_title)
+                                img(src=article_second.thumb_path,alt=article_second.article_title)
+                                .title.ta-c #{article_second.article_title}
+                    tr
+                        td.pr0(width='240')
+                            a(href='/article_detail/'+article_third.article_id+'.html',target='_blank',title=article_third.article_title)
+                                img(src=article_third.thumb_path,alt=article_third.article_title)
+                                .title.ta-c #{article_third.article_title}
+            
+            .categorys
+                a.cur(href='javascript:;') 最新文章
+                for category in article_category
+                    a(href='javascript:;','data-category'=category.category_type) #{category.category_name}
+            
+            input#article_category(type='hidden')
+            input#article_page(type='hidden',value='1')
+            
+            #article_list.article-list
+                for article in article_list
+                    a.article-item(href='/article_detail/'+article.article_id+'.html',target='_blank')
+                        .thumb
+                            img(src=article.thumb_path,alt=article.article_title)
+                        .limit
+                            h4.title #{article.article_title}
+                            h5.summary #{article.article_lead}
+                        p
+                            span.author #{article.author_name}
+                            span.tag #{article.article_tag}&nbsp;&nbsp; #{article.create_time}
+            
+            #article_loading.article-loadmore 加载中，请稍后...
+            #article_loadnone.article-loadmore(style={display:'none'}) 喂喂，你触碰到我的底线了
+        
+        .article-right
+            .search
+                form#search_form(action='',target='_blank',method='post')
+                input#keyword(type='text',placeholder='大家都在搜',onkeyup='keywordEnter()')
+                input#keywordBtn(type='button',onclick='keywordSearch()')
+            
+            .flash
+                h4.title 7×24h&nbsp;快讯
+                for flash in flash_list
+                    .flash-item
+                        a(href='javascript:;') #{flash.flash_title}
+                        div !{flash.flash_content}
+                        p #{flash.create_time}
+            
+            #article_swiper.swiper-container.swiper.mt20
+                .swiper-wrapper
+                    .swiper-slide
+                        a(href='javascript:;')
+                            img(src='/images/welfare/welfare_banner_1.jpg')
+                    .swiper-slide
+                        a(href='javascript:;')
+                            img(src='/images/welfare/welfare_banner_2.jpg')
+                .swiper-pagination
+                .swiper-button-prev
+                .swiper-button-next
+            
+            .recommend.mt20(style={'border-top':'none'})
+                h4.title 推荐阅读
+                for recommend in article_recommend
+                    .recommend-item
+                        a(href='/article_detail/'+recommend.article_id+'.html',target='_blank') #{recommend.article_title}
+
+block append pub_foot
+    script(src='/js/swiper.min.js')
+    script(src='/js/swiper.animate.min.js')
+    script(type='text/javascript').
+        function keywordEnter(e){
+            var eve = e || window.event;
+            if(eve.keyCode == 13){
+                keywordSearch();
+            }
+        }
+        
+        function keywordSearch(){
+            if($.trim($("#keyword").val()) == ""){
+                return;
+            }
+            $("#search_form").attr('action','/article_search/'+$("#keyword").val());
+            $("#search_form").submit();
+        }
+        
+        $(function(){
+            
+            lazyLoading();//图片懒加载
+            $(window).on("scroll",function(){
+                lazyLoading();
+            })
+            
+            scrollTop("ico_top");//返回顶部
+            
+            var mySwiper = new Swiper ('#article_swiper', {
+                loop : true,
+                autoplay: {
+                    delay: 8000,//8秒切换一次
+                },
+                pagination: {
+                    el: '.swiper-pagination',
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                }
+            })
+            
+            $(".flash-item a").on("click",function(){
+                $(this).parent().toggleClass("active");
+                $(this).siblings("div").slideToggle();
+            })
+            
+        })

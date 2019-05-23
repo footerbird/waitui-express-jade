@@ -1,0 +1,104 @@
+extends layout
+
+block prepend pub_head
+    link(rel='stylesheet', href='/css/swiper.min.css')
+
+block content
+    .container.after-cls.pt30.pb30
+        .article-left
+            .search
+                input#keyword(type='text',placeholder='大家都在搜',value=keyword,onkeyup='keywordEnter()')
+                input#keywordBtn(type='button',value='搜索',onclick='keywordSearch()')
+            
+            .hotwords
+                font 热搜词：
+                for hotword in article_hotword
+                    a(href='/article_search/'+hotword.hotword_name) #{hotword.hotword_name}
+            
+            input#article_page(type='hidden',value='1')
+            
+            .article-list(style={'border-top':'1px solid #e6e8eb'})
+                for article in article_list
+                    a.article-item(href='/article_detail/'+article.article_id+'.html',target='_blank')
+                        .thumb
+                            img(src=article.thumb_path,alt=article.article_title)
+                        .limit
+                            h4.title #{article.article_title}
+                            h5.summary #{article.article_lead}
+                        p
+                            span.author #{article.author_name}
+                            span.tag #{article.article_tag}&nbsp;&nbsp; #{article.create_time}
+            
+            #article_loading.article-loadmore 加载中，请稍后...
+            #article_loadnone.article-loadmore(style={display:'none'}) 喂喂，你触碰到我的底线了
+        
+        .article-right(style={'padding-top':'55px'})
+            
+            .flash(style={'border-top':'none'})
+                h4.title 7×24h&nbsp;快讯
+                for flash in flash_list
+                    .flash-item
+                        a(href='javascript:;') #{flash.flash_title}
+                        div !{flash.flash_content}
+                        p #{flash.create_time}
+            
+            #article_swiper.swiper-container.swiper.mt20
+                .swiper-wrapper
+                    .swiper-slide
+                        a(href='javascript:;')
+                            img(src='/images/welfare/welfare_banner_1.jpg')
+                    .swiper-slide
+                        a(href='javascript:;')
+                            img(src='/images/welfare/welfare_banner_2.jpg')
+                .swiper-pagination
+                .swiper-button-prev
+                .swiper-button-next
+            
+            .recommend.mt20(style={'border-top':'none'})
+                h4.title 推荐阅读
+                for recommend in article_recommend
+                    .recommend-item
+                        a(href='/article_detail/'+recommend.article_id+'.html',target='_blank') #{recommend.article_title}
+
+block append pub_foot
+    script(src='/js/swiper.min.js')
+    script(src='/js/swiper.animate.min.js')
+    script(type='text/javascript').
+        function keywordEnter(e){
+            var eve = e || window.event;
+            if(eve.keyCode == 13){
+                keywordSearch();
+            }
+        }
+        
+        function keywordSearch(){
+            if($.trim($("#keyword").val()) == ""){
+                return;
+            }
+            location.href = '/article_search/'+$("#keyword").val();
+        }
+        
+        $(function(){
+            
+            scrollTop("ico_top");//返回顶部
+            
+            var mySwiper = new Swiper ('#article_swiper', {
+                loop : true,
+                autoplay: {
+                    delay: 8000,//8秒切换一次
+                },
+                pagination: {
+                    el: '.swiper-pagination',
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                }
+            })
+            
+            $(".flash-item a").on("click",function(){
+                $(this).parent().toggleClass("active");
+                $(this).siblings("div").slideToggle();
+            })
+            
+        })

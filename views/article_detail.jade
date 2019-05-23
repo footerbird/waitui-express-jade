@@ -1,0 +1,107 @@
+extends layout
+
+block prepend pub_head
+    link(rel='stylesheet', href='/css/swiper.min.css')
+    script(type='text/javascript').
+        function loadHtmlImg(obj){}
+
+block content
+    .container.after-cls.pt30.pb30
+        .article-left.bg-white.pl20.pr20
+            article
+                .title #{article.article_title}
+                .author
+                    img.figure(src=article.figure_path)
+                    span.name #{article.author_name}
+                    span.time #{article.create_time}
+                    span.read(style={display:'none'}) 阅读： #{article.article_read}
+                .summary #{article.article_lead}
+                section !{article.article_content}
+                a.dashang-btn(href='javascript:;',onclick='Pop.open(\'upwin_dashang\');') 打赏支持
+        
+        .article-right.bg-white
+            
+            .recommend.pl20.pr20(style={'border-top':'none'})
+                h4.title 相关阅读
+                - var rela_count = 0;
+                for relative in article_relative
+                    while rela_count < 3
+                        - rela_count++;
+                        .recommend-item
+                            a(href='/article_detail/'+relative.article_id+'.html',target='_blank') #{relative.article_title}
+            
+            #article_swiper.swiper-container.swiper.mt20
+                .swiper-wrapper
+                    .swiper-slide
+                        a(href='javascript:;')
+                            img(src='/images/welfare/welfare_banner_1.jpg')
+                    .swiper-slide
+                        a(href='javascript:;')
+                            img(src='/images/welfare/welfare_banner_2.jpg')
+                .swiper-pagination
+                .swiper-button-prev
+                .swiper-button-next
+            
+            .flash.mt20.pl20.pr20(style={'border-top':'none'})
+                h4.title 7×24h&nbsp;快讯
+                for flash in flash_list
+                    .flash-item
+                        a(href='javascript:;') #{flash.flash_title}
+                        div !{flash.flash_content}
+                        p #{flash.create_time}
+    
+    //用户登录弹框
+    #upwin_dashang.upwin(style={'border-radius':'8px',display:'none'}).
+        <a href="javascript:;" class="upwin-title-close" onclick="Pop.exit();"></a>
+        <div class="upwin-content">
+            <div class="upwin-dashang">
+                <img class="dashang-logo" src="/images/dashang-logo.png" />
+                <p class="dashang-thanks">感谢你对外推网的支持！</p>
+                <div class="dashang-qrcode-box">
+                    <img class="dashang-qrcode" id="dashang_qrcode_alipay" src="/images/dashang-alipay.jpg" />
+                    <img class="dashang-qrcode" id="dashang_qrcode_wechat" src="/images/dashang-wechat.jpg" style="display: none;" />
+                </div>
+                <p class="dashang-advice">扫码打赏，建议金额1-10元</p>
+                <div class="dashang-payway">
+                    <label class="dashang-payway-alipay"><input type="radio" name="dashang_payway" id="dashang_payway_alipay" value="alipay" onclick="changeDashangPayway()" checked="checked" /><i></i></label>
+                    <label class="dashang-payway-wechat"><input type="radio" name="dashang_payway" id="dashang_payway_wechat" value="wechat" onclick="changeDashangPayway()" /><i></i></label>
+                </div>
+                <p class="dashang-bottom-tips">提醒：打赏金额将直接进入对方账号，无法退款，请您谨慎操作。</p>
+            </div>
+        </div>
+    
+block append pub_foot
+    script(src='/js/swiper.min.js')
+    script(src='/js/swiper.animate.min.js')
+    script(type='text/javascript').
+        function changeDashangPayway(){
+            if($("#dashang_payway_alipay").is(":checked")){//如果是支付宝打赏
+                $("#dashang_qrcode_alipay").show().siblings().hide();
+            }else{
+                $("#dashang_qrcode_wechat").show().siblings().hide();
+            }
+        }
+        
+        $(function(){
+            
+            scrollTop("ico_top");//返回顶部
+            
+            var mySwiper = new Swiper ('#article_swiper', {
+                loop : true,
+                autoplay: {
+                    delay: 8000,//8秒切换一次
+                },
+                pagination: {
+                    el: '.swiper-pagination',
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                }
+            })
+            
+            $(".flash-item a").on("click",function(){
+                $(this).parent().toggleClass("active");
+                $(this).siblings("div").slideToggle();
+            })
+        })

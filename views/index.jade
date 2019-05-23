@@ -1,0 +1,58 @@
+extends layout
+
+block content
+    .home-banner
+        .fly-box
+            i.fly
+        .fade-in-up
+            h1 您的一站式品牌管家
+            h4(style={'text-indent': '-5px'}) 广告直投，精准抵达目标用户；品牌资讯，增加企业品牌曝光；品牌管理，提升企业品牌价值
+            a(href='javascript:;',onclick='func_upwin_login()') 立即体验>>
+  
+    //精准的客户定位
+    .home-topic.home-topic-target
+        .container
+            .intro-box.fl-l
+                h2| 精准的定向能力<br>瞄准活跃客户
+                p 我们根据用户的地理位置、使用设备、活跃时间以及用户的操作习惯为您描绘出精确的用户画像，帮助您选择合适的品牌营销群体
+                a(href='javascript:;',onclick='func_upwin_login()') 立即体验>>
+            .image-box.fl-r
+                img(src='/images/home-topic-target.png')
+  
+    //多样的营销方式
+    .home-topic.home-topic-types
+        .container
+            .image-box.fl-l
+                img(src='/images/home-topic-types.png')
+                ul
+                    li(style={'margin-top':'60px'}) <i class="kaipin"></i><span>开屏广告</span>
+                    li(style={'margin-top':'15px'}) <i class="fanye"></i><span>翻页广告</span>
+                    li(style={'margin-top':'0'}) <i class="baodao"></i><span>品牌报道</span>
+                    li(style={'margin-top':'15px'}) <i class="faxian"></i><span>发现频道</span>
+                    li(style={'margin-top':'60px'}) <i class="pintuan"></i><span>品牌拼团</span>
+            .intro-box.fl-r
+                h2.col-white| 多样的营销方式<br>提升用户体验
+                p.col-white 我们提供首页开屏广告、翻页刷屏广告、品牌品牌报道、品牌活动发现频道以及品牌助力拼团等多种营销方式，帮助企业将信息推送给真正有兴趣的用户
+                a(href='javascript:;',onclick='func_upwin_login()') 立即体验>>
+    
+    //专业的品牌管理
+    .home-topic.home-topic-manage
+        .container.after-cls
+            .intro-box.fl-l
+                h2| 专业的品牌管理<br>提高市场竞争力
+                p 我们拥有来自域名、商标、知识产权等行业的专业品牌保护团队，可以解决在品牌建设中会遇到的各种各样的问题，从而帮助企业树立良好的企业形象、打造品牌优势、发展品牌战略。
+                a(href='javascript:;',onclick='func_upwin_login()') 立即体验>>
+            .image-box.fl-r
+                img(src='/images/home-topic-manage.png')
+
+block append pub_foot
+    script(type='text/javascript').
+        $(function(){
+            $(window).on("scroll",function(){
+                if($(window).scrollTop()>50){
+                    $(".top-bar").removeClass("top-bar-home").addClass("top-bar-fixed");
+                }else{
+                    $(".top-bar").removeClass("top-bar-fixed").addClass("top-bar-home");
+                }
+            })
+        })
