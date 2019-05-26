@@ -12,8 +12,16 @@ router.get('/article_list.html', function(req, res, next) {
     waitui.article_list(req, res, next);
 });
 
+router.post('/get_articleListAjax_tpl', function(req, res, next) {
+    waitui.get_articleListAjax_tpl(req, res, next);
+});
+
 router.all('/article_search/:keyword', function(req, res, next) {
     waitui.article_search(req, res, next);
+});
+
+router.post('/get_articleSearchAjax_tpl', function(req, res, next) {
+    waitui.get_articleSearchAjax_tpl(req, res, next);
 });
 
 router.get('/article_detail/:article_id.html', function(req, res, next) {

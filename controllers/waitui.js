@@ -112,6 +112,72 @@ module.exports = {
             });
         });
     },
+    //资讯列表加载更多（模板加載）
+    get_articleListAjax_tpl: function (req, res, next) {
+        pool.getConnection(async function(err, connection) {
+            var article_model = require('../models/article_model.js');
+            //req.params取的是url段的参数，req.query取的是?后的参数，req.body取的是ajax或者说是取你post方法中form里的传来的key value
+            var category = req.body.category?req.body.category:'';
+            var page = req.body.page?req.body.page:1;
+            var repeat = req.body['repeat[]']?req.body['repeat[]']:[];
+            var page_size = 10;//单页记录数
+            var offset = (page-1)*page_size;//偏移量
+            
+            var queryList = function(){
+                return new Promise(function (resolve, reject) {
+                    connection.query(article_model.get_articleList,[offset,page_size], function(err, result) {
+                        if(result){
+                            resolve(result);
+                        }
+                    })
+                })
+            }
+            
+            var queryCategoryList = function(cate){
+                return new Promise(function (resolve, reject) {
+                    connection.query(article_model.get_articleListByCategory,[cate,offset,page_size], function(err, result) {
+                        if(result){
+                            resolve(result);
+                        }
+                    })
+                })
+            }
+            
+            var queryAuthor = function(id){
+                return new Promise(function (resolve, reject) {
+                    connection.query(article_model.get_authorinfoById,id, function(err, result) {
+                        if(result){
+                            resolve(result[0].author_name);
+                        }
+                    })
+                })
+            }
+            
+            if(category == ''){
+                var article_list = await queryList();
+            }else{
+                var article_list = await queryCategoryList(category);
+            }
+            
+            for(var i=0; i<article_list.length; i++){
+                article_list[i].create_time = util.format_article_time(article_list[i].create_time);
+                article_list[i].author_name = await queryAuthor(article_list[i].author_id);
+            }
+            
+            if(repeat.length != 0){
+                for(var i=0; i<article_list.length; i++){
+                    if(repeat.indexOf((article_list[i].article_id).toString()) != -1){
+                        article_list.splice(i,1);
+                    }
+                }
+            }
+            
+            connection.release();// 释放连接
+            res.render('tpl_article', { 
+                article_list: article_list,
+            });
+        })
+    },
     //资讯搜索
     article_search: function (req, res, next) {
         pool.getConnection(async function(err, connection) {
@@ -123,8 +189,6 @@ module.exports = {
                 return new Promise(function (resolve, reject) {
                     connection.query(article_model.get_articleSearch,['%'+kwd+'%',0,10], function(err, result) {
                         if(result){
-                            console.log('querySearchList:');
-                            console.log(result);
                             resolve(result);
                         }
                     })
@@ -195,6 +259,49 @@ module.exports = {
                 flash_list: flash_list,
             });
         });
+    },
+    //资讯搜索加载更多（模板加載）
+    get_articleSearchAjax_tpl: function (req, res, next) {
+        pool.getConnection(async function(err, connection) {
+            var article_model = require('../models/article_model.js');
+            //req.params取的是url段的参数，req.query取的是?后的参数，req.body取的是ajax或者说是取你post方法中form里的传来的key value
+            var keyword = req.body.keyword?req.body.keyword:'';
+            var page = req.body.page?req.body.page:1;
+            var page_size = 10;//单页记录数
+            var offset = (page-1)*page_size;//偏移量
+            
+            var querySearchList = function(kwd){
+                return new Promise(function (resolve, reject) {
+                    connection.query(article_model.get_articleSearch,['%'+kwd+'%',offset,page_size], function(err, result) {
+                        if(result){
+                            resolve(result);
+                        }
+                    })
+                })
+            }
+            
+            var queryAuthor = function(id){
+                return new Promise(function (resolve, reject) {
+                    connection.query(article_model.get_authorinfoById,id, function(err, result) {
+                        if(result){
+                            resolve(result[0].author_name);
+                        }
+                    })
+                })
+            }
+            
+            var article_list = await querySearchList(keyword);
+            for(var i=0; i<article_list.length; i++){
+                article_list[i].create_time = util.format_article_time(article_list[i].create_time);
+                article_list[i].author_name = await queryAuthor(article_list[i].author_id);
+            }
+            
+            connection.release();// 释放连接
+            res.render('tpl_article', { 
+                article_list: article_list,
+            });
+            
+        })
     },
     //资讯详情
     article_detail: function (req, res, next) {

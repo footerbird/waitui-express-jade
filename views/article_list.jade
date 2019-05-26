@@ -129,4 +129,64 @@ block append pub_foot
                 $(this).siblings("div").slideToggle();
             })
             
+            var article_loading = false;//状态标记
+            $(window).on("scroll",function(){
+                if($("#article_loadnone").is(":visible")) return;
+                if($(window).scrollTop() + $(window).height() + 100 < $(document).height()) return;
+                if(article_loading) return;
+                article_loading = true;
+                var current_page = parseInt($("#article_page").val());
+                $.ajax({
+                    type:"post",
+                    url:"/get_articleListAjax_tpl",
+                    async:true,
+                    data:{
+                        category:$("#article_category").val(),
+                        page: current_page+1
+                    },
+                    success:function(html){
+                        var $html = $(html.replace(/[\r\n]/g,""));
+                        if($html.length < 10){
+                            $("#article_loading").hide();
+                            $("#article_loadnone").show();
+                        }
+                        $("#article_list").append(html);
+                        $("#article_page").val(current_page+1);
+                        article_loading = false;
+                    }
+                });
+            })
+            
+            $(".categorys a").on("click",function(){
+                $("#article_category").val($(this).data("category")?$(this).data("category"):"");
+                $(this).addClass("cur").siblings().removeClass("cur");
+                $("#article_list").empty();
+                $("#article_page").val(0);
+                $("#article_loading").show();
+                $("#article_loadnone").hide();
+                article_loading = true;
+                var current_page = parseInt($("#article_page").val());
+                var repeatArr = [#{article_first.article_id},#{article_second.article_id},#{article_third.article_id}];
+                $.ajax({
+                    type:"post",
+                    url:"/get_articleListAjax_tpl",
+                    async:true,
+                    data:{
+                        category:$("#article_category").val(),
+                        page: current_page+1,
+                        repeat: repeatArr
+                    },
+                    success:function(html){
+                        var $html = $(html.replace(/[\r\n]/g,""));
+                        if($html.length < 10){
+                            $("#article_loading").hide();
+                            $("#article_loadnone").show();
+                        }
+                        $("#article_list").html(html);
+                        $("#article_page").val(current_page+1);
+                        article_loading = false;
+                    }
+                });
+            })
+            
         })

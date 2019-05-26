@@ -17,7 +17,7 @@ block content
             
             input#article_page(type='hidden',value='1')
             
-            .article-list(style={'border-top':'1px solid #e6e8eb'})
+            #article_list.article-list(style={'border-top':'1px solid #e6e8eb'})
                 for article in article_list
                     a.article-item(href='/article_detail/'+article.article_id+'.html',target='_blank')
                         .thumb
@@ -28,9 +28,12 @@ block content
                         p
                             span.author #{article.author_name}
                             span.tag #{article.article_tag}&nbsp;&nbsp; #{article.create_time}
-            
-            #article_loading.article-loadmore 加载中，请稍后...
-            #article_loadnone.article-loadmore(style={display:'none'}) 喂喂，你触碰到我的底线了
+            if article_list.length == 10
+                #article_loading.article-loadmore 加载中，请稍后...
+                #article_loadnone.article-loadmore(style={display:'none'}) 喂喂，你触碰到我的底线了
+            else
+                #article_loading.article-loadmore(style={display:'none'}) 加载中，请稍后...
+                #article_loadnone.article-loadmore 喂喂，你触碰到我的底线了
         
         .article-right(style={'padding-top':'55px'})
             
@@ -100,5 +103,35 @@ block append pub_foot
                 $(this).parent().toggleClass("active");
                 $(this).siblings("div").slideToggle();
             })
+            
+            if('#{article_list.length}' == '10'){
+                var article_loading = false;//状态标记
+                $(window).on("scroll",function(){
+                    if($("#article_loadnone").is(":visible")) return;
+                    if($(window).scrollTop() + $(window).height() + 100 < $(document).height()) return;
+                    if(article_loading) return;
+                    article_loading = true;
+                    var current_page = parseInt($("#article_page").val());
+                    $.ajax({
+                        type:"post",
+                        url:"/get_articleSearchAjax_tpl",
+                        async:true,
+                        data:{
+                            keyword:$("#keyword").val(),
+                            page: current_page+1
+                        },
+                        success:function(html){
+                            var $html = $(html.replace(/[\r\n]/g,""));
+                            if($html.length < 10){
+                                $("#article_loading").hide();
+                                $("#article_loadnone").show();
+                            }
+                            $("#article_list").append(html);
+                            $("#article_page").val(current_page+1);
+                            article_loading = false;
+                        }
+                    });
+                })
+            }
             
         })

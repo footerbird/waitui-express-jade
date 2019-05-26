@@ -1,0 +1,10 @@
+for article in article_list
+    a.article-item(href='/article_detail/'+article.article_id+'.html',target='_blank')
+        .thumb
+            img(src=article.thumb_path,alt=article.article_title)
+        .limit
+            h4.title #{article.article_title}
+            h5.summary #{article.article_lead}
+        p
+            span.author #{article.author_name}
+            span.tag #{article.article_tag}&nbsp;&nbsp; #{article.create_time}
