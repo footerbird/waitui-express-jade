@@ -37,6 +37,10 @@ Then install dependencies:
 cd waitui-express-jade
 npm install
 ```
+Install mysql module
+```
+npm install mysql --save
+```
 Run the app:
 ```
 npm start
