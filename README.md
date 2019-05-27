@@ -30,7 +30,7 @@ express --view waitui-express-jade
 ```
 If you want to use other template engine(like ejs)(defaults to jade), then
 ```
-express --view==ejs myapp
+express --view=ejs myapp
 ```
 Then install dependencies:
 ```
