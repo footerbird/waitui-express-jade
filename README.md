@@ -8,7 +8,7 @@ Use the application generator tool, express-generator, to quickly create an appl
 
 ```
 npm install express-generator -g
-express --view waitui-express-jade
+express --view=jade waitui-express-jade
 
    create : waitui-express-jade
    create : waitui-express-jade/package.json
